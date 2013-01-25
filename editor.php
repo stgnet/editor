@@ -1,5 +1,40 @@
 <?php
-    if ($_SERVER['REQUEST_METHOD']=="POST")
+	if (file_exists('.editor-auth.php')) require('.editor-auth.php');
+	if (empty($edituser) || empty($editpass))
+	{
+		if (!empty($_POST['edituser']) && !empty($_POST['editpass']))
+		{
+			$edituser=$_POST['edituser'];
+			$editpass=$_POST['editpass'];
+			file_put_contents('.editor-auth.php','<'."?php
+			global \$edituser,\$editpass;
+			\$edituser='$edituser';
+			\$editpass='$editpass';
+			");
+			chmod('.editor-auth.php',0700);
+		}
+		else
+		{
+			exit("<html><h3>Enter authentication for editor:</h3>
+			<form method=\"post\" action=\"editor.php\">
+			Username: <input type=\"text\" name=\"edituser\" /><br />
+			Password: <input type=\"password\" name=\"editpass\" /><br />
+			<input type=\"submit\" name=\"submit\" value=\"Submit\" />
+			</form></html>");
+		}
+	}
+
+    if (empty($_SERVER['PHP_AUTH_USER']) || 
+		empty($_SERVER['PHP_AUTH_PW']) ||
+		$_SERVER['PHP_AUTH_USER']!=$edituser ||
+		$_SERVER['PHP_AUTH_PW']!=$editpass)
+	{
+		header('HTTP/1.1 401 Unauthorized');
+		header("WWW-Authenticate: Basic realm=\"Editor\"");
+        exit('Unauthorized');
+	}
+
+	if ($_SERVER['REQUEST_METHOD']=="POST")
     {
         if (empty($_POST['editfile'])) die('no filename');
         if (file_put_contents($_POST['editfile'],$_POST['content'])===false)
@@ -105,7 +140,10 @@
     if (!empty($_GET['file']))
     {
         $editfile=$_GET['file'];
-		$content=file_get_contents($editfile);
+		if (file_exists($editfile))
+			$content=file_get_contents($editfile);
+		else
+			$editfile='';
 	}
 	echo "<input type=\"hidden\" id=\"editfile\" name=\"editfile\" value=\"$editfile\" />";
 	echo '<textarea id="editbox">'.htmlentities($content).'</textarea>';
@@ -131,10 +169,11 @@
         enterMode: "keep",
         tabMode: "shift",
     });
-    $('#save').click(function(){
+	function save(run)
+	{
         var editfile=$('#editfile').val();
 		if (editfile=='') editfile=prompt("Enter filename");
-        editor.save();
+		editor.save();
         var content=editor.getValue();
         $.ajax({
             type: "POST",
@@ -142,16 +181,29 @@
             data: {editfile:editfile,content:content},
             success: function(data){
                 if (data!='-SUCCESS-') alert('SAVE FAILED: '+data);
+				if (run)
+				{
+					window.open(editfile,'_blank');
+					window.focus();
+				}
+				else
+					window.location.href='editor.php?file='+editfile;
             },
             error: function(xhr){
                 alert('ERROR: '+xhr.status+' '+xhr.statusText+' '+xhr.responseText);
             }
-                
         });
+	}
+    $('#save').click(function(){
+		save(false);
         return false;
     });
+	$('#run').click(function(){
+		save(true);
+		return false;
+	});
+	
 });
 </script>
-
 </body>
 </html>
