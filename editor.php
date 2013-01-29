@@ -1,9 +1,24 @@
 <?php
+    $version="v1.1";
+
+    // username/password authentication
 	if (file_exists('.editor-auth.php')) require('.editor-auth.php');
 	if (empty($edituser) || empty($editpass))
 	{
-		if (!empty($_POST['edituser']) && !empty($_POST['editpass']))
+        // user/pass hasn't been set
+		if (empty($_POST['edituser']) || empty($_POST['editpass']))
 		{
+            // prompt for it
+			exit("<html><h3>Enter authentication for editor:</h3>
+			<form method=\"post\" action=\"editor.php\">
+			Username: <input type=\"text\" name=\"edituser\" /><br />
+			Password: <input type=\"password\" name=\"editpass\" /><br />
+			<input type=\"submit\" name=\"submit\" value=\"Submit\" />
+			</form></html>");
+		}
+		else
+		{
+            // store it privately
 			$edituser=$_POST['edituser'];
 			$editpass=$_POST['editpass'];
 			file_put_contents('.editor-auth.php','<'."?php
@@ -13,17 +28,9 @@
 			");
 			chmod('.editor-auth.php',0700);
 		}
-		else
-		{
-			exit("<html><h3>Enter authentication for editor:</h3>
-			<form method=\"post\" action=\"editor.php\">
-			Username: <input type=\"text\" name=\"edituser\" /><br />
-			Password: <input type=\"password\" name=\"editpass\" /><br />
-			<input type=\"submit\" name=\"submit\" value=\"Submit\" />
-			</form></html>");
-		}
 	}
 
+    // if authoriztion not provided, force it
     if (empty($_SERVER['PHP_AUTH_USER']) || 
 		empty($_SERVER['PHP_AUTH_PW']) ||
 		$_SERVER['PHP_AUTH_USER']!=$edituser ||
@@ -34,13 +41,17 @@
         exit('Unauthorized');
 	}
 
+    // save file being edited
 	if ($_SERVER['REQUEST_METHOD']=="POST")
     {
         if (empty($_POST['editfile'])) die('no filename');
         if (file_put_contents($_POST['editfile'],$_POST['content'])===false)
             die('Error writing file');
+        chmod($_POST['editfile'],0755); // assume apache may need readability
         exit("-SUCCESS-");
     }
+
+    // run command (shell prompt)
     if (!empty($_GET['cmd']))
     {
         $home=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -67,6 +78,7 @@
         exit(false);
     }
 
+    // get a list of files
     $dirs=new RecursiveDirectoryIterator(".");
     $files=new RecursiveIteratorIterator($dirs);
 
@@ -76,6 +88,7 @@
     if (!empty($_GET['file']))
         $editfile=$_GET['file'];
 
+    // build form in toolbar
     $form="
 <form class=\"form-inline\">
     <div class=\"input-append\">
@@ -90,6 +103,7 @@
     {
         $path=substr($file,2);
         if ($path[0]==".") continue;
+        if (strstr($path,'/.')) continue;
         if (is_dir($path)) continue;
         if (!is_file($path)) continue;
 
@@ -105,6 +119,7 @@
     </div>
 </form>\n";
 
+// HTML5 using Bootstrap & Codemirror 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -127,14 +142,15 @@
 <body id="page1">
     <div id="navbar1" class="navbar">
         <div id="div1" class="navbar-inner">
-            <a id="link1" class="brand" href="#">Editor</a>
+            <a id="link1" class="brand" href="#">Editor <?php echo $version; ?></a>
             <span id="navlist1" class="pull-right">
                 <?php echo $form; ?>
             </span>
         </div>
     </div>
-    <div>
+    <div id="workspace" style="height: auto; border: 1px solid;">
 <?php
+    // push the current file contents to codemirror via textarea
     $editfile='';
 	$content="";
     if (!empty($_GET['file']))
@@ -147,6 +163,8 @@
 	}
 	echo "<input type=\"hidden\" id=\"editfile\" name=\"editfile\" value=\"$editfile\" />";
 	echo '<textarea id="editbox">'.htmlentities($content).'</textarea>';
+
+    // tail portion of HTML with JS libraries
 ?>
     </div>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -158,7 +176,18 @@
 <script src="//cdn.jsdelivr.net/codemirror/2.37/mode/clike/clike.js"></script>
 <script src="//cdn.jsdelivr.net/codemirror/2.37/mode/php/php.js"></script>
 
-<script type="text/javascript">$(document).ready(function(){
+<script type="text/javascript">
+
+    // fix the iframe height
+    function setIframeHeight()
+    {
+        var iframe=document.getElementById('runbox');
+        var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
+        iframe.height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
+    };
+
+    // after document load enable CodeMirror
+$(document).ready(function(){
     var editor = CodeMirror.fromTextArea(document.getElementById("editbox"), {
         lineNumbers: true,
         lineWrapping: true,
@@ -169,6 +198,7 @@
         enterMode: "keep",
         tabMode: "shift",
     });
+    // how to save edited file from CodeMirror (sends to POST above)
 	function save(run)
 	{
         var editfile=$('#editfile').val();
@@ -180,11 +210,14 @@
             url: "editor.php",
             data: {editfile:editfile,content:content},
             success: function(data){
-                if (data!='-SUCCESS-') alert('SAVE FAILED: '+data);
+                if (data!='-SUCCESS-')
+                    alert('SAVE FAILED: '+data);
+                else
 				if (run)
 				{
-					window.open(editfile,'_blank');
-					window.focus();
+					//window.open(editfile,'_blank');
+					//window.focus();
+                    $('#workspace').empty().append('<iframe id="runbox" onLoad="setIframeHeight()" width="100%" allowtransparency=true frameborder=0 scrolling=no src="'+editfile+'"></iframe>');
 				}
 				else
 					window.location.href='editor.php?file='+editfile;
@@ -194,6 +227,7 @@
             }
         });
 	}
+    // save and run buttons
     $('#save').click(function(){
 		save(false);
         return false;
