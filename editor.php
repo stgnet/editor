@@ -1,40 +1,75 @@
 <?php
-    $version="v1.1";
+    $version="v1.2";
+    global $password_locations;
+    $password_locations=array('.','/tmp');
+
+    if (array_key_exists('phpinfo',$_GET)) exit(phpinfo());
+    if (array_key_exists('globals',$_GET)) exit('<html><body><pre>'.print_r($GLOBALS,true));
+
+    if (array_key_exists('update',$_GET))
+    {
+        $update=file_get_contents("https://raw.github.com/stgnet/editor/master/editor.php");
+        if (empty($update))
+            exit("ERROR: Unable to download update file");
+        file_put_contents("previous-editor.php",file_get_contents("editor.php"));
+        file_put_contents("editor.php",$update);
+        header("refresh:3;url=editor.php");
+        exit("Update written to update.php - reloading...");
+    }
 
     // username/password authentication
-	if (file_exists('.editor-auth.php')) require('.editor-auth.php');
-	if (empty($edituser) || empty($editpass))
+    $password_file='.editor'.str_replace('/','_',dirname($_SERVER['SCRIPT_FILENAME'])).'.php';
+    foreach ($password_locations as $location)
+    {
+        $password_path=$location.'/'.$password_file;
+        if (file_exists($password_path))
+        {
+            require($password_path);
+            break;
+        }
+    }
+	if (empty($editor_user) || empty($editor_pass))
 	{
         // user/pass hasn't been set
-		if (empty($_POST['edituser']) || empty($_POST['editpass']))
+		if (empty($_POST['new_editor_user']) || empty($_POST['new_editor_pass']))
 		{
             // prompt for it
 			exit("<html><h3>Enter authentication for editor:</h3>
 			<form method=\"post\" action=\"editor.php\">
-			Username: <input type=\"text\" name=\"edituser\" /><br />
-			Password: <input type=\"password\" name=\"editpass\" /><br />
+			Username: <input type=\"text\" name=\"new_editor_user\" /><br />
+			Password: <input type=\"password\" name=\"new_editor_pass\" /><br />
 			<input type=\"submit\" name=\"submit\" value=\"Submit\" />
 			</form></html>");
 		}
 		else
 		{
             // store it privately
-			$edituser=$_POST['edituser'];
-			$editpass=$_POST['editpass'];
-			file_put_contents('.editor-auth.php','<'."?php
-			global \$edituser,\$editpass;
-			\$edituser='$edituser';
-			\$editpass='$editpass';
-			");
-			chmod('.editor-auth.php',0700);
+			$editor_user=$_POST['new_editor_user'];
+			$editor_pass=md5($editor_user.'&'.$_POST['new_editor_pass']);
+            foreach ($password_locations as $location)
+            {
+                $password_path=$location.'/'.$password_file;
+    			file_put_contents($password_path,'<'."?php
+global \$editor_user,\$editor_pass;
+\$editor_user='$editor_user';
+\$editor_pass='$editor_pass';
+");
+                if (file_exists($password_path))
+                {
+			        chmod($password_path,0700);
+                    header("refresh:3;url=editor.php");
+                    exit("Saved password to $password_path");
+                }
+            }
+            exit("ERROR: Unable to save password to $password_file");
 		}
 	}
 
     // if authoriztion not provided, force it
     if (empty($_SERVER['PHP_AUTH_USER']) || 
 		empty($_SERVER['PHP_AUTH_PW']) ||
-		$_SERVER['PHP_AUTH_USER']!=$edituser ||
-		$_SERVER['PHP_AUTH_PW']!=$editpass)
+		$_SERVER['PHP_AUTH_USER']!=$editor_user ||
+		md5($_SERVER['PHP_AUTH_USER'].'&'.$_SERVER['PHP_AUTH_PW'])!=$editor_pass)
 	{
 		header('HTTP/1.1 401 Unauthorized');
 		header("WWW-Authenticate: Basic realm=\"Editor\"");
