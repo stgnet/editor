@@ -8,6 +8,17 @@
         curl_close($ch);
         return($contents);
     }
+    if (get_magic_quotes_gpc())
+    {
+        function stripslashes_gpc(&$value)
+        {
+            $value = stripslashes($value);
+        }
+        array_walk_recursive($_GET, 'stripslashes_gpc');
+        array_walk_recursive($_POST, 'stripslashes_gpc');
+        array_walk_recursive($_COOKIE, 'stripslashes_gpc');
+        array_walk_recursive($_REQUEST, 'stripslashes_gpc');
+    }
 
     $version="v1.3";
     global $password_locations;
@@ -200,7 +211,7 @@ global \$editor_user,\$editor_pass;
 <body id="page1">
     <div id="navbar1" class="navbar">
         <div id="div1" class="navbar-inner">
-            <a id="link1" class="brand" href="#">Editor <?php echo (get_magic_quotes_gpc()?"Magic Quotes ON!":$version); ?></a>
+            <a id="link1" class="brand" href="#">Editor <?php echo $version; ?></a>
             <span id="navlist1" class="pull-right">
                 <?php echo $form; ?>
             </span>
