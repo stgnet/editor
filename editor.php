@@ -8,7 +8,8 @@
         curl_close($ch);
         return($contents);
     }
-    $version="v1.2";
+
+    $version="v1.3";
     global $password_locations;
     $password_locations=array('.','/tmp');
 
@@ -199,7 +200,7 @@ global \$editor_user,\$editor_pass;
 <body id="page1">
     <div id="navbar1" class="navbar">
         <div id="div1" class="navbar-inner">
-            <a id="link1" class="brand" href="#">Editor <?php echo $version; ?></a>
+            <a id="link1" class="brand" href="#">Editor <?php echo (get_magic_quotes_gpc()?"Magic Quotes ON!":$version); ?></a>
             <span id="navlist1" class="pull-right">
                 <?php echo $form; ?>
             </span>
