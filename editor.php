@@ -6,6 +6,16 @@
     if (array_key_exists('phpinfo',$_GET)) exit(phpinfo());
     if (array_key_exists('globals',$_GET)) exit('<html><body><pre>'.print_r($GLOBALS,true));
 
+    if (array_key_exists('authfix',$_GET))
+    {
+        file_put_contents('.htaccess','<IfModule mod_rewrite.c>
+  RewriteEngine on
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+</IfModule>
+');
+        exit('Wrote .htaccess');
+    }
+
     if (array_key_exists('update',$_GET))
     {
         $update=file_get_contents("https://raw.github.com/stgnet/editor/master/editor.php");
@@ -73,6 +83,9 @@ global \$editor_user,\$editor_pass;
 	{
 		header('HTTP/1.1 401 Unauthorized');
 		header("WWW-Authenticate: Basic realm=\"Editor\"");
+        //echo '<pre>'.print_r($GLOBALS,true);
+		//echo $_SERVER['PHP_AUTH_USER'].'&'.$_SERVER['PHP_AUTH_PW'].'!='.$editor_pass."\n";
+		//echo md5($_SERVER['PHP_AUTH_USER'].'&'.$_SERVER['PHP_AUTH_PW']).'!='.$editor_pass."\n";
         exit('Unauthorized');
 	}
 
