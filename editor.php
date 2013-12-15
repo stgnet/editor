@@ -1,4 +1,13 @@
 <?php
+    function curl_get_contents($url)
+    {
+        $ch=curl_init();
+        curl_setopt($ch,CURLOPT_URL,$url);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        $contents=curl_exec($ch);
+        curl_close($ch);
+        return($contents);
+    }
     $version="v1.2";
     global $password_locations;
     $password_locations=array('.','/tmp');
@@ -18,7 +27,7 @@
 
     if (array_key_exists('update',$_GET))
     {
-        $update=file_get_contents("https://raw.github.com/stgnet/editor/master/editor.php");
+        $update=curl_get_contents("https://raw.github.com/stgnet/editor/master/editor.php");
         if (empty($update))
             exit("ERROR: Unable to download update file");
         file_put_contents("previous-editor.php",file_get_contents("editor.php"));
