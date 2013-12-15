@@ -160,7 +160,7 @@ global \$editor_user,\$editor_pass;
     foreach ($files as $file)
     {
         $path=substr($file,2);
-        if ($path[0]==".") continue;
+        if ($path[0]=="." && $path!=".htaccess") continue;
         if (strstr($path,'/.')) continue;
         if (is_dir($path)) continue;
         if (!is_file($path)) continue;
