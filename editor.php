@@ -133,8 +133,19 @@ global \$editor_user,\$editor_pass;
         foreach ($_SERVER as $var => $value)
             putenv("$var=$value");
 
+        $shboxd='shboxd-'.trim(`uname -m`);
+        if (!file_exists($shboxd))
+        {
+            $url='https://raw.github.com/stgnet/editor/master/'.$shboxd;
+            $executable=curl_get_contents($url);
+            if (empty($executable) || $executable[0]=='<')
+                exit("ERROR: Unable to download $shboxd");
+            file_put_contents($shboxd,$executable);
+			chmod($shboxd,0755);
+        }
+
         $cmd=$_GET['cmd'];
-        $fp=popen("./shboxd`uname -m` --cgi -t -s \"/:\$(/usr/bin/id -u):\$(/usr/bin/id -g):$home:$cmd\" 2>&1","r");
+        $fp=popen("./$shboxd --cgi -t -s \"/:\$(/usr/bin/id -u):\$(/usr/bin/id -g):$home:$cmd\" 2>&1","r");
         $valid=array('X-ShellInABox-Port','X-ShellInABox-Pid','Content-type');
         while ($line=trim(fgets($fp)))
         {
