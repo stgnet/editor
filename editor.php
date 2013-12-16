@@ -134,7 +134,7 @@ global \$editor_user,\$editor_pass;
             putenv("$var=$value");
 
         $cmd=$_GET['cmd'];
-        $fp=popen("/usr/sbin/shellinaboxd --cgi -t -s \"/:\$(/usr/bin/id -u):\$(/usr/bin/id -g):$home:$cmd\" 2>&1","r");
+        $fp=popen("./shboxd`uname -m` --cgi -t -s \"/:\$(/usr/bin/id -u):\$(/usr/bin/id -g):$home:$cmd\" 2>&1","r");
         $valid=array('X-ShellInABox-Port','X-ShellInABox-Pid','Content-type');
         while ($line=trim(fgets($fp)))
         {
