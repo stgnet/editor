@@ -164,8 +164,19 @@ global \$editor_user,\$editor_pass;
     }
 
     // get a list of files
-    $dirs=new RecursiveDirectoryIterator(".");
-    $files=new RecursiveIteratorIterator($dirs);
+    class SortedIterator extends SplHeap
+    {
+        public function __construct(Iterator $iter)
+        {
+            foreach ($iter as $item)
+                $this->insert($item);
+        }
+        public function compare($b, $a)
+        {
+            return strcmp($a->getRealpath(), $b->getRealpath());
+        }
+    }
+    $files=new SortedIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(".")));
 
     $newfile="&#171; New File &#187;";
 
