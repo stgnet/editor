@@ -176,7 +176,7 @@ global \$editor_user,\$editor_pass;
             return strcmp($a->getRealpath(), $b->getRealpath());
         }
     }
-    $files=new SortedIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(".")));
+    $files=new SortedIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(".",RecursiveDirectoryIterator::FOLLOW_SYMLINKS)));
 
     $newfile="&#171; New File &#187;";
 
