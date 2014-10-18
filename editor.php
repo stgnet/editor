@@ -20,7 +20,7 @@
         array_walk_recursive($_REQUEST, 'stripslashes_gpc');
     }
 
-    $version="v1.3";
+    $version="v3.0alpha";
     global $password_locations;
     $password_locations=array('.','/tmp');
 
@@ -211,7 +211,7 @@ global \$editor_user,\$editor_pass;
     $form.="</select>
         <button type=\"submit\" class=\"btn\">Edit</button>
         <span class=\"divider-vertical\"></span>
-        <a target=\"_blank\" href=\"editor.php?cmd=sh\" class=\"btn\">Shell</a>
+        <a target=\"_blank\" href=\"editor.php?cmd=sh\" class=\"btn btn-default active\" role=\"button\">Shell</a>
     </div>
 </form>\n";
 
@@ -220,9 +220,13 @@ global \$editor_user,\$editor_pass;
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Editor</title>
     <meta charset="utf-8" />
-    <link href="//netdna.bootstrapcdn.com/bootswatch/2.1.1/cerulean/bootstrap.min.css" rel="stylesheet">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="PHP Based Online Editor Tool">
+	<meta name="author" content="http://github.com/stgnet/editor">
+    <title>Editor</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="//cdn.jsdelivr.net/codemirror/2.37/codemirror.css" rel="stylesheet">
     <style type="text/css">
         .CodeMirror {
@@ -234,17 +238,53 @@ global \$editor_user,\$editor_pass;
             overflow-x: auto;
         }
     </style>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
-<body id="page1">
-    <div id="navbar1" class="navbar">
-        <div id="div1" class="navbar-inner">
-            <a id="link1" class="brand" href="#">Editor <?php echo $version; ?></a>
-            <span id="navlist1" class="pull-right">
-                <?php echo $form; ?>
-            </span>
+<body>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Editor <?php echo $version; ?></a>
         </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+			  <!---
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+				--->
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+                <?php echo $form; ?>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
     </div>
-    <div id="workspace" style="height: auto; border: 1px solid;">
+
+	<h1>&nbsp;</h1>
+	<div id="workspace" style="height: auto; border: 1px solid;">
 <?php
     // push the current file contents to codemirror via textarea
     $editfile='';
@@ -264,7 +304,7 @@ global \$editor_user,\$editor_pass;
 ?>
     </div>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <script src="//cdn.jsdelivr.net/codemirror/2.37/codemirror.js"></script>
 <script src="//cdn.jsdelivr.net/codemirror/2.37/mode/xml/xml.js"></script>
 <script src="//cdn.jsdelivr.net/codemirror/2.37/mode/javascript/javascript.js"></script>
