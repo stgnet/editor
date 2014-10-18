@@ -5,6 +5,7 @@ PHP Editor
 * Provides web based editing of PHP scripts
 * Can execute scripts (now in iframe without popup)
 * If ShellInABox is available, provides web-based shell prompt
+* Uses Bootstrap 3
 
 Future Feature
 ---
