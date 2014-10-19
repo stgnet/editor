@@ -226,7 +226,7 @@ global \$editor_user,\$editor_pass;
     <meta name="description" content="PHP Based Online Editor Tool">
 	<meta name="author" content="http://github.com/stgnet/editor">
     <title>Editor</title>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/cerulean/bootstrap.min.css" rel="stylesheet">
     <link href="//cdn.jsdelivr.net/codemirror/2.37/codemirror.css" rel="stylesheet">
     <style type="text/css">
         .CodeMirror {
