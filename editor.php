@@ -227,7 +227,7 @@ global \$editor_user,\$editor_pass;
 	<meta name="author" content="http://github.com/stgnet/editor">
     <title>Editor</title>
     <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/cerulean/bootstrap.min.css" rel="stylesheet">
-    <link href="//cdn.jsdelivr.net/codemirror/2.37/codemirror.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.10.0/codemirror.css" rel="stylesheet">
     <style type="text/css">
         .CodeMirror {
             border: 1px solid #eee;
@@ -305,12 +305,12 @@ global \$editor_user,\$editor_pass;
     </div>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script src="//cdn.jsdelivr.net/codemirror/2.37/codemirror.js"></script>
-<script src="//cdn.jsdelivr.net/codemirror/2.37/mode/xml/xml.js"></script>
-<script src="//cdn.jsdelivr.net/codemirror/2.37/mode/javascript/javascript.js"></script>
-<script src="//cdn.jsdelivr.net/codemirror/2.37/mode/css/css.js"></script>
-<script src="//cdn.jsdelivr.net/codemirror/2.37/mode/clike/clike.js"></script>
-<script src="//cdn.jsdelivr.net/codemirror/2.37/mode/php/php.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.10.0/codemirror.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.10.0/mode/xml/xml.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.10.0/mode/javascript/javascript.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.10.0/mode/css/css.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.10.0/mode/clike/clike.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.10.0/mode/php/php.js"></script>
 
 <script type="text/javascript">
 
