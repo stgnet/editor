@@ -110,6 +110,22 @@ global \$editor_user,\$editor_pass;
         exit('Unauthorized');
 	}
 
+	if ($_SERVER['REQUEST_METHOD']=="POST" && !empty($_FILES['userfile']))
+	{
+		$userfile=$_FILES['userfile'];
+		if (move_uploaded_file($userfile['tmp_name'],$userfile['name']))
+		{
+			$result="Upload completed to ".$userfile['name'];
+		}
+		else
+		{
+			$result="Upload failed: ".$userfile['error'];
+		}
+
+		echo '<html><H3>'.$result.'</H3></html>';
+		exit(0);
+	}
+
     // save file being edited
 	if ($_SERVER['REQUEST_METHOD']=="POST")
     {
@@ -120,6 +136,19 @@ global \$editor_user,\$editor_pass;
         exit("-SUCCESS-");
     }
 
+    if (array_key_exists('upload',$_GET))
+	{
+		$uploadForm=<<<EOF
+<form enctype="multipart/form-data" action="editor.php" method="POST">
+    <H3>Upload a file</H3>
+    Upload file: <input name="userfile" type="file" />
+    <input type="submit" value="Send" />
+</form>
+EOF;
+
+		echo '<html>'.$uploadForm.'</html>';
+		exit(0);
+	}
     if (!empty($_GET['sh']))
     {
         header('Content-type: text/plain');
@@ -193,7 +222,7 @@ global \$editor_user,\$editor_pass;
         <button type=\"submit\" id=\"run\" class=\"btn\">Run</button>
         <span class=\"divider-vertical\"></span>
         <select class=\"input\" id=\"file\" name=\"file\">
-        <option>$newfile</option>
+		<option>$newfile</option>
 ";
     foreach ($files as $file)
     {
@@ -211,6 +240,8 @@ global \$editor_user,\$editor_pass;
     $form.="</select>
         <button type=\"submit\" class=\"btn\">Edit</button>
         <span class=\"divider-vertical\"></span>
+		<a target=\"_blank\" href=\"editor.php?upload\" class=\"btn btn-default active\" role=\"button\">Upload</a>
+        <a                   href=\"editor.php?update\" class=\"btn btn-default active\" role=\"button\">Update</a>
         <a target=\"_blank\" href=\"editor.php?cmd=sh\" class=\"btn btn-default active\" role=\"button\">Shell</a>
     </div>
 </form>\n";
